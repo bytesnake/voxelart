@@ -1,0 +1,31 @@
+﻿Kürzel:
+Nils		bre
+Alexander	sic
+Stefan		bit
+Lorenz		byt
+
+Was zu tun ist						Wer das machen will, oder auch nicht...
+
+--- ENGINE ---
+- Licht						
+- Schatten					
+- Normale Kamera
+- Third Person Kamera		
+- Sprites								bit
+- Partikel								bre
+- Partikelsystem						bre
+- Kollisionen				
+- Sound						
+- Meshs aus Dateien laden		
+- einfacheren Zugriff auf				sic?
+  den Input (Taste gedrückt, usw)
+  
+--- SPIEL ---
+- Weltverwaltung						byt
+- Voxel Editor
+- Leveleditor
+- Klasse für Spieler
+- Dateiformat für Charaktere
+- Animationen für Charaktere (key-frame?)
+- Klasse für NPCs
+- Klasse für Monster

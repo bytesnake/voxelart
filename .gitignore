@@ -1,0 +1,11 @@
+/bin/windows/*
+/bin/windows/bsb_engine/*
+/bin/linux/*
+/bin/linux/bsb_engine/*
+/cubiverse
+/cubiverse.exe
+/screenshot.png
+/src/*~
+/src/bsb_engine/*~
+/inc/*~
+/inc/bsb_engine/*~
