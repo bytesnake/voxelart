@@ -18,6 +18,8 @@ namespace cubiverse {
 
 		private:
 			string menu;
+			int width, height;
+			Bsb_Font* std_font;
 
 			void drawMenu();
 			void drawMap();
@@ -26,12 +28,8 @@ namespace cubiverse {
 			std::vector<int> buttonPosition;
 			std::vector<string> buttonName;
 			void drawButton();
-			//void checkButton(int x, int y);
 			void addButton(string name, int x, int y, int width, int height);
 				
-			int width, height;
-			
-			Bsb_Font* std_font;
 		public:	
 			string getMenu() { return menu; };
 			void drawFPS(int fps);

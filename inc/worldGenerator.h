@@ -19,7 +19,6 @@ class worldGenerator
 	double getNoiseHeight(int p_x, int p_z, int p_y);
 	double getNoiseColor(int p_x, int p_z);
 	double getTreeMap(int p_x, int p_z);
-	//void generateHighMap(int w, int h, int p_x, int p_z, int random);
 
 
 };

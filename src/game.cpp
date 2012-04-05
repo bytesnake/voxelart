@@ -154,7 +154,7 @@ void cubiverse::Game::render()
 	//Falls sich die Position des Spieler um 16 in X/Z geändert hat
 	if(playerX != oldPlayerX || playerZ != oldPlayerZ) {
 
-                //Liste mit den zu Generierenden CHunks refreshen
+                //Liste mit den zu Generierenden Chunks refreshen
 		this->test_world->clearChunksList();
 		this->test_world->addChunksToList(-playerX, -playerZ);
                 //Chunks außerhalb der sich löschen
@@ -178,14 +178,15 @@ void cubiverse::Game::render()
 	//GUI zeichnen
 	GUI->draw();
 
-	//GUI->checkButton(10,10);
-	glEnable(GL_TEXTURE_2D);
+	//FPS Zeichnen
 	glLoadIdentity();
+	glEnable(GL_TEXTURE_2D);
 	glColor4f(1.0f,1.0f,1.0f,1.0f);//Schriftfarbe auf weiß setzen
 	GUI->drawFPS(currentFPS);
 	glDisable(GL_TEXTURE_2D);
 	backToFrustum();//im nächsten Frame wollen wir wieder 3D malen	
-	glutSwapBuffers();//front- und back-buffer vertauschen => Das Bild wird angezeigt :) TODO in Bsb_Game auslagern?
+
+	glutSwapBuffers();//front- und back-buffer vertauschen => Das Bild wird angezeigt :) 
 }
 
 //Funktionen an Tastendrücke binden

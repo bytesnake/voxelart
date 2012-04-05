@@ -184,7 +184,6 @@ cubiverse::World_Chunk::pointer_t cubiverse::World::mapGenerator(int p_x, int p_
 						if(height==500) { height=y;}
 						newChunk->m_blockType[BLOCK_INDEX(x,y,z)] = 2;
 						Cube::pointer_t newCube = boost::make_shared<Cube>();
-						//newCube->setColor(0.1f, 0.1,5*heightMap[x][z][y], 1.0f);//verschiedene Farben im Wasser (kann man das irgendwie über die echte tiefe machen?)
 						newCube->setColor(0.0f, 0.0f, 1.0f, 1.0f);
 						//Verschiedene Farbe je nach höhe
 						//Je höher desto heller
@@ -252,7 +251,6 @@ void cubiverse::World::render(int playerX, int playerZ) {
 			}
 		}
 	}
-	//glBlendFunc(GL_SRC_COLOR, GL_DST_COLOR);
 	//Das gleiche fürs Wasser
 	for(int x=-128; x <= 128; x=x+16) {
 		for(int z=-128; z <= 128; z=z+16) {
@@ -267,7 +265,6 @@ void cubiverse::World::render(int playerX, int playerZ) {
 			}
 		}
 	}
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
 }
 /*
  * Erneuert die Mesh, indem sie die Cubes
@@ -356,17 +353,12 @@ void cubiverse::World::renderChunk(int p_x, int p_z) {
 		getChunk(p_x, p_z)->mesh->render();
 	}
 }
-//TODO: Was muss openGL gegeben werden, damit das wierklich transparent gezeichnet wird 	
+//TODO: Auf Texturen umstellen, immoment werden einfach die Farben kombiniert	
 void cubiverse::World::renderChunkWater(int p_x, int p_z) {
 	if(hasChunk(p_x, p_z) && getChunk(p_x, p_z)->m_render) {
-		//glDisable(GL_DEPTH_TEST);
-		//glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_COLOR, GL_DST_COLOR);
-		//glDepthMask(GL_FALSE);
 		getChunk(p_x, p_z)->mesh_water->render();
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
-		//glDisable(GL_BLEND);
-		//glEnable(GL_DEPTH_TEST);
 	}
 }
 
@@ -403,21 +395,6 @@ void cubiverse::World_Chunk::refreshVisibility(bool existChunk[4], cubiverse::Wo
 							m_cubes[BLOCK_INDEX(x,y,z)]->show(5);
 							
 					}
-					/*if(m_blockType[BLOCK_INDEX(x,y,z)] != 0) {	
-						if((z >= 15) ? ((existChunk[0]) ? arroundChunks[0]->m_blockType[BLOCK_INDEX(x,y,0)]==0:0): m_blockType[BLOCK_INDEX(x,y,(z+1))]==0) 
-							m_cubes[BLOCK_INDEX(x,y,z)]->show(0);
-						if((z <= 0) ? ((existChunk[1]) ? arroundChunks[1]->m_blockType[BLOCK_INDEX(x,y,15)]==0:0): m_blockType[BLOCK_INDEX(x,y,(z-1))]==0) 
-							m_cubes[BLOCK_INDEX(x,y,z)]->show(1);
-						if((x >= 15) ? ((existChunk[2]) ? arroundChunks[2]->m_blockType[BLOCK_INDEX(0,y,z)]==0:0): m_blockType[BLOCK_INDEX((x+1),y,z)]==0)
-							m_cubes[BLOCK_INDEX(x,y,z)]->show(2);
-						if((x <= 0) ? ((existChunk[3]) ? arroundChunks[3]->m_blockType[BLOCK_INDEX(15,y,z)]==0:0): m_blockType[BLOCK_INDEX((x-1),y,z)]==0)
-							m_cubes[BLOCK_INDEX(x,y,z)]->show(3);
-						if((y >= 127) ? 0: m_blockType[BLOCK_INDEX(x,(y+1),z)] == 0)
-							m_cubes[BLOCK_INDEX(x,y,z)]->show(4);
-						if((y <= 0) ? 0: m_blockType[BLOCK_INDEX(x,(y-1),z)] == 0)
-							m_cubes[BLOCK_INDEX(x,y,z)]->show(5);
-							
-					}*/
 					
 			}
 		}
