@@ -13,6 +13,11 @@ void cubiverse::GUI::changeMenu(string menu) {
 		draw.connect(boost::bind( &cubiverse::GUI::drawMap, this));
 		draw.connect(boost::bind( &cubiverse::GUI::drawBottom, this));
 	}	
+	else if(menu == "Voxel") {
+		this->menu=menu;
+		draw.disconnect_all_slots();
+		draw.connect(boost::bind( &cubiverse::GUI::drawBottom, this));
+	}
 	else if(menu == "Main")  {
 		this->menu=menu;
 
@@ -106,7 +111,7 @@ void cubiverse::GUI::drawMenu() {
 void cubiverse::GUI::drawMap() {
 }
 void cubiverse::GUI::drawBottom() {
-	cout << "drawBottom" << endl;	
+	//cout << "drawBottom" << endl;	
 }
 void cubiverse::GUI::drawFPS(int fps) {
 	char tmp[10];

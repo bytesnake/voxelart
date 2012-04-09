@@ -62,11 +62,10 @@ void cubiverse::Game::init(){
 	//hideCursor();
 
 	//Neue (test) world generieren
-	test_world = boost::make_shared<cubiverse::World>(0.02, 64 , 6, 50);
 	GUI = boost::make_shared<cubiverse::GUI>(width, height);
 
 	// First Person Kamera initialisieren
-	myCamera=new Bsb_FPCamera(0,0,0);
+	myCamera=new Bsb_FPCamera(0,100,0);
 
 	//Position des einen Lichts, das wir haben
 	GLfloat light_position[] = { 0.35, 0.5f, 0.15, 0.0 };
@@ -92,15 +91,12 @@ void cubiverse::Game::init(){
 	
 	glEnable (GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
-	//TODO: Mehrere Threads, die gleichzeitig rendern
-	//for(int i=0; i < 1; i ++) 
-	//test_world->groupRender.create_thread( boost::bind( &World::generateThread, test_world));
+
+	voxelEditor = boost::make_shared<cubiverse::VoxelEditor>(); 
 
 	boost::thread move( boost::bind( &cubiverse::Game::movePlayer, this));
 
-	groupRender.create_thread( boost::bind( &cubiverse::World::generateThread, test_world));
-
-	test_world->addChunksToList(0, 0);
+	testWorldInit = false;
 
 
 }
@@ -170,11 +166,18 @@ void cubiverse::Game::render()
 		oldPlayerX = playerX; oldPlayerZ = playerZ;		
 	}
 
-	if(GUI->getMenu() == "Singleplayer" || GUI->getMenu() == "Multiplayer") 
-		test_world->render(playerX, playerZ);
+	if(GUI->getMenu() == "Singleplayer" || GUI->getMenu() == "Multiplayer") {
+		if(!testWorldInit) {
+			test_world = boost::make_shared<cubiverse::World>(0.02, 64 , 6, 50);
+			testWorldInit = true;
+		}
+		else test_world->render(playerX, playerZ);
+	}
+
+	else if(GUI->getMenu() == "Voxel")
+		voxelEditor->render(-myCamera->position->x, -myCamera->position->y, -myCamera->position->z);
 
 	switchToOrtho();// Das HUD wollen wir in 2D zeichnen
-	
 	//GUI zeichnen
 	GUI->draw();
 
@@ -185,7 +188,6 @@ void cubiverse::Game::render()
 	GUI->drawFPS(currentFPS);
 	glDisable(GL_TEXTURE_2D);
 	backToFrustum();//im nächsten Frame wollen wir wieder 3D malen	
-
 	glutSwapBuffers();//front- und back-buffer vertauschen => Das Bild wird angezeigt :) 
 }
 
@@ -198,6 +200,9 @@ void cubiverse::Game::key_pressed(unsigned char key){
 			break;
 		case ' ':
 			myCamera->jump();//TODO in die Spielerklasse auslagern und die Position der Kamera von Spieler abhängig machen
+			break;
+		case 'r':
+			voxelEditor->checkCollision(0, 30, 10);
 			break;
 		case 'q':
 			myCamera->down();
@@ -241,7 +246,6 @@ void cubiverse::Game::mouse_event(int button, int state, int x, int y){
 		GUI->changeMenu(menu);
 		cout << menu << endl;
 		if(menu == "Main") {
-			cout << "TROLOLOLO" << endl;
 			showCursor();
 		}
 		else if(menu == "Singleplayer" || menu == "Multiplayer") {

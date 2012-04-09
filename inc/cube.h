@@ -49,12 +49,15 @@ struct Cube
 	 */
 	bool visible[6];
 	float color[4];
+	float a; // Seitenlänge
 	void show(int id);
+	void hide(int id);
 	void setColor(float r, float g, float b, float a);	
+	GLfloat* multVert(float b, GLfloat* a);
 	
 	void renderToMesh(float p_x,float p_y,float p_z,vector<Vertex>* p_vertices,vector<GLuint>* p_indices);
 	void renderSideTM(int p_side,float p_x,float p_y,float p_z,vector<Vertex>* p_vertices,vector<GLuint>* p_indices);
-	Cube();
+	Cube(float a);
 	//~Cube();
 };
 #endif

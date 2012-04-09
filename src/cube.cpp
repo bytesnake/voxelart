@@ -26,7 +26,8 @@ GLfloat vertices_back[]   = { 0.5,-0.5,-0.5,  -0.5,-0.5,-0.5,  -0.5, 0.5,-0.5,  
                      
 GLubyte indices_alw[] = {0,1,2, 0,2,3}; // Die Indizes sind für jede Seite gleich
 
-Cube::Cube(){	
+Cube::Cube(float a){	
+	this->a = a;
 	for(int i=0;i<6;i++){//erstmal alle Seiten unsichtbar machen
 		visible[i]=false;
 	}
@@ -36,10 +37,18 @@ void Cube::show(int id) {
 	visible[id] = true;
 }
 
+void Cube::hide(int id) {
+	visible[id] = false;
+}
 void Cube::setColor(float r, float g, float b, float a) {
 	color[0] = r; color[1] = g; color[2] = b; color[3] =a;
 }
 
+GLfloat* Cube::multVert(float b, GLfloat* a) {
+	for(int i=0; i < sizeof(a)/sizeof(a[0]); i++)
+		a[i] = a[i]*b;
+	return a;
+}
 /**
  * schreibt die Vertices und indizes direkt in diesen puffer
  */
@@ -56,47 +65,46 @@ Vertex tmpvert;
 void Cube::renderSideTM(int p_side,float p_x,float p_y,float p_z,vector<Vertex>* p_vertices,vector<GLuint>* p_indices){
 	int oldsize=p_vertices->size();
 
-	float normals[3];
+	GLfloat normals[3];
 	GLfloat* vertices;
 	switch(p_side){
 		case 0:
 			normals[0]=0;
 			normals[1]=0;
-			normals[2]=1;
-			vertices=vertices_front;
+			normals[2]=a;
+			vertices=multVert(a, vertices_front);
 			break;
 		case 1:
 			normals[0]=0;
 			normals[1]=0;
-			normals[2]=-1;
-			vertices=vertices_back;
+			normals[2]=-a;
+			vertices=multVert(a, vertices_back);
 			break;
 		case 2:
-			normals[0]=1;
+			normals[0]=a;
 			normals[1]=0;
 			normals[2]=0;
-			vertices=vertices_right;
+			vertices=multVert(a, vertices_right);
 			break;
 		case 3:
-			normals[0]=-1;
+			normals[0]=-a;
 			normals[1]=0;
 			normals[2]=0;
-			vertices=vertices_left;
+			vertices=multVert(a, vertices_left);
 			break;
 		case 4:
 			normals[0]=0;
-			normals[1]=1;
+			normals[1]=a;
 			normals[2]=0;
-			vertices=vertices_top;
+			vertices=multVert(a, vertices_top);
 			break;
 		case 5:
 			normals[0]=0;
-			normals[1]=-1;
+			normals[1]=-a;
 			normals[2]=0;
-			vertices=vertices_bottom;
+			vertices=multVert(a, vertices_bottom);
 			break;
 	}
-	
 	tmpvert.normal[X_POS]=normals[0];
 	tmpvert.normal[Y_POS]=normals[1];
 	tmpvert.normal[Z_POS]=normals[2];

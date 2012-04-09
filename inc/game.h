@@ -6,6 +6,7 @@
 #include "PlayerBody.h"
 #include "world.h"
 #include "GUI.h"
+#include "VoxelEditor.h"
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 #include <boost/thread.hpp> 
@@ -37,9 +38,10 @@ namespace cubiverse {
 			void switchToOrtho();
 			void backToFrustum();
 		private:
-			boost::thread_group groupRender;
+			bool testWorldInit;
 			cubiverse::World::pointer_t test_world;
 			cubiverse::GUI::pointer_t GUI;
+			cubiverse::VoxelEditor::pointer_t voxelEditor;
 	};
 }
 #endif

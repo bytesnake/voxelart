@@ -1,9 +1,8 @@
 #ifndef BSB_MESH_H
 #define BSB_MESH_H
 
-#include "bsb_texture.h"
-//#include "../main.h"
 #include "bsb_game.h"
+#include "bsb_texture.h"
 
 using namespace std;
 
@@ -18,21 +17,14 @@ struct Vertex
 };
  
 class Bsb_Mesh:Bsb_Object{
-	private:
-		/*float* colors;
-		unsigned char* indices;
-		float* texCoords;
-		float* normals;
-	
-		Bsb_Texture* texture;
-
-    	int indices_count;*/
-		GLuint vboID; // Vertex Buffer Object ID
-		GLuint indexVBOID; // Index Buffer Object ID
-		vector<Vertex> vertices;
-		vector<GLuint> indices;
+    private:
+	GLuint vboID; // Vertex Buffer Object ID
+	GLuint indexVBOID; // Index Buffer Object ID
+	vector<Vertex> vertices;
+	vector<GLuint> indices;
+	bool isRender, existData;
     public:
-	    Bsb_Mesh();
+	Bsb_Mesh();
     	Bsb_Vector* position;
     	virtual void render();
     	void createMesh();
@@ -40,14 +32,6 @@ class Bsb_Mesh:Bsb_Object{
     	void deleteMesh();
     	void setVertices(vector<Vertex> p_vertices);
     	void setIndices(vector<GLuint> p_indices);
-    	
-/*    	void setVertices(float[],int);
-    	void setColors(float p_colors[]);
-    	void setIndices(unsigned char p_indices[],int p_count);
-    	void setTextureCoords(float p_texcoords[]);
-    	void setNormals(float p_normals[]);
-    	void setTexture(Bsb_Texture* p_texture);
-    	float* vertices;*/
 };
 
 // Location/Normals
