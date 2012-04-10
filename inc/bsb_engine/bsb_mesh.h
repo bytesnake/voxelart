@@ -32,6 +32,8 @@ class Bsb_Mesh:Bsb_Object{
     	void deleteMesh();
     	void setVertices(vector<Vertex> p_vertices);
     	void setIndices(vector<GLuint> p_indices);
+	bool isrender() { return isRender; }
+	bool existdata() { return existData; }
 };
 
 // Location/Normals

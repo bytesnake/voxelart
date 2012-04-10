@@ -10,7 +10,7 @@ Bsb_Mesh::Bsb_Mesh(){
  * creates the mesh from the vertices
  */
 void Bsb_Mesh::createMesh(){
-	if(existData) {
+	if(existData && !isRender) {
 		glGenBuffers(1, &vboID); // Create the buffer ID, this is basically the same as generating texture ID's
 		glBindBuffer(GL_ARRAY_BUFFER, vboID); // Bind the buffer (vertex array data)
 	
@@ -93,8 +93,9 @@ void Bsb_Mesh::render(){
 		glDisableClientState(GL_NORMAL_ARRAY);
 		glDisableClientState(GL_VERTEX_ARRAY);
 	}
-	else
-		createMesh();
+	//WARNING: Besser nicht, da sonst der RenderThread dem CreateThread in die quere kommt
+	//else
+	//	createMesh();
 }
 
 void Bsb_Mesh::deleteMesh(){

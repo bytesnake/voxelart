@@ -34,27 +34,25 @@ namespace cubiverse {
 	{
 		typedef boost::shared_ptr<cubiverse::World_Chunk> pointer_t;
 
-		bool m_render;
 		uint32_t m_x, m_z;
-		uint8_t m_blockType[16*128*16];
-		uint8_t m_blockLightning[16*128*16];
+		int m_blockType[16*128*16];
+		int m_blockLightning[16*128*16];
 		Cube::pointer_t m_cubes[16*128*16];
 		Bsb_Mesh* mesh;
 		Bsb_Mesh* mesh_water;
 
-		uint8_t getBlockType(int x, int y, int z) {  return m_blockType[BLOCK_INDEX(x,y,z)]; }
+		int getBlockType(int x, int y, int z) {  return m_blockType[BLOCK_INDEX(x,y,z)]; }
 		void setBlockType(int x, int y, int z, uint8_t blockType) { m_blockType[BLOCK_INDEX(x,y,z)] = blockType;}
 		uint8_t getLightning(int x, int y, int z) { return m_blockLightning[BLOCK_INDEX(x,y,z)]; }
 		void setLightning(int x, int y, int z, uint8_t lightning) {  m_blockLightning[BLOCK_INDEX(x,y,z)] = lightning;  }
-		bool isRender() {  return m_render;}
-		void setRender(bool render) { m_render = render;}
 
 		Cube::pointer_t getCube(int x, int y, int z) { return m_cubes[BLOCK_INDEX(x,y,z)]; }
 		void refreshVisibility(bool existChunk[4], cubiverse::World_Chunk::pointer_t arround[4]);
 
-		
-		
-		
+		World_Chunk() { 
+			mesh = new Bsb_Mesh();
+			mesh_water = new Bsb_Mesh();	
+		}					
 	};
 
 	class World {
@@ -75,8 +73,6 @@ namespace cubiverse {
 			cubiverse::World_Chunk::pointer_t getChunk(int x, int z) { return m_chunks[make_pair(x,z)]; }
 			void setChunk(int x, int z, cubiverse::World_Chunk::pointer_t chunk) { m_chunks[make_pair(x,z)] = chunk; }
 			void delChunk(int x, int z);
-			bool hasBlock(int x, int y, int z) { return hasChunk(x,z) && getChunk(x,z)->getCube(x-(x%16),y,z-(z%16)) != 0; }
-			Cube::pointer_t getCube(int x, int y, int z) { if(hasBlock(x,y,z)) return getChunk(x,z)->getCube(x-(x%16),y,z-(z%16)); }
 
 			//Rendern eines Chunks
 			void renderChunk(int p_x, int p_z);
@@ -94,7 +90,7 @@ namespace cubiverse {
 	
 			vector< pair <int,pair <int,bool > > > generateChunks; //Chunks
 			chunkList_t m_chunks; //Zu generierende Chunks
-			int m_seed;
+
 			//Für Threads
 			boost::thread_group groupRender;
 			boost::mutex mutexRender; //Mutex ob Rendern oder verändern
