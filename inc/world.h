@@ -35,13 +35,13 @@ namespace cubiverse {
 		typedef boost::shared_ptr<cubiverse::World_Chunk> pointer_t;
 
 		uint32_t m_x, m_z;
-		int m_blockType[16*128*16];
+		uint8_t m_blockType[16*128*16];
 		int m_blockLightning[16*128*16];
 		Cube::pointer_t m_cubes[16*128*16];
 		Bsb_Mesh* mesh;
 		Bsb_Mesh* mesh_water;
 
-		int getBlockType(int x, int y, int z) {  return m_blockType[BLOCK_INDEX(x,y,z)]; }
+		uint8_t getBlockType(int x, int y, int z) {  return m_blockType[BLOCK_INDEX(x,y,z)]; }
 		void setBlockType(int x, int y, int z, uint8_t blockType) { m_blockType[BLOCK_INDEX(x,y,z)] = blockType;}
 		uint8_t getLightning(int x, int y, int z) { return m_blockLightning[BLOCK_INDEX(x,y,z)]; }
 		void setLightning(int x, int y, int z, uint8_t lightning) {  m_blockLightning[BLOCK_INDEX(x,y,z)] = lightning;  }
@@ -84,6 +84,7 @@ namespace cubiverse {
 			void updateMesh(int x, int z);
 			void deleteMesh(int x, int z);
 			void refreshMesh(int x, int z);
+			void refreshMeshSide(int p_x, int p_z, int side);
 			void render();
 
 		private:
@@ -96,6 +97,7 @@ namespace cubiverse {
 			boost::mutex mutexRender; //Mutex ob Rendern oder verändern
 			boost::mutex mutexGenerateList; //Mutex Generieren oder Liste zum Generieren verändern
 			boost::mutex mutexAddChunksList;
+			boost::mutex mutexRefreshVisible;
 
 			cubiverse::World_Chunk::pointer_t mapGenerator(int x, int z);
 			void refreshVisibility(cubiverse::World_Chunk::pointer_t);

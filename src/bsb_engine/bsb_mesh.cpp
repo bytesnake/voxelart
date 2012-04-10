@@ -56,10 +56,6 @@ void Bsb_Mesh::updateMesh(){
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexVBOID); 
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), &indices.front(), GL_STATIC_DRAW);
 	}
-	else {
-		createMesh();
-		if(existData) updateMesh();
-	}
 }
 
 void Bsb_Mesh::render(){

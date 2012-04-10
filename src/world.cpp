@@ -26,7 +26,9 @@ cubiverse::World::World(float freq, int height, int octaves, int seed) {
 	//Generiere eine Liste mit Chunks
 	addChunksToList(0, 0);	
 	//Starte die Threads
-	groupRender.create_thread( boost::bind( &cubiverse::World::generateThread, this));		
+	groupRender.create_thread( boost::bind( &cubiverse::World::generateThread, this));
+	groupRender.create_thread( boost::bind( &cubiverse::World::generateThread, this));
+	groupRender.create_thread( boost::bind( &cubiverse::World::generateThread, this));
 }
 
 /*
@@ -48,12 +50,9 @@ void cubiverse::World::generateThread() {
 			mutexGenerateList.unlock();
 
 			//Falls er nicht gerade generiert wird -> anfangen
-			if(!it.second.second) {
+			if(!generateChunks.back().second.second) {
 				mutexGenerateList.lock();
-				//Eintragen, er wird jetzt generiert
-				pair<int,bool> firstCoor(z, true);
-				pair<int,pair<int,bool> > coord(x,firstCoor); 
-				it = coord;
+				(it).second.second = true;
 				mutexGenerateList.unlock();
 
 				//Generieren, dies steht nicht im Mutex, da es am Ressourcenlastigsten ist
@@ -66,16 +65,24 @@ void cubiverse::World::generateThread() {
 				setChunk(x, z, newChunk);
 
 				refreshVisibility(x,z);
-				if(hasChunk(x, (z+16)))
+				if(hasChunk(x, (z+16))) {
 					refreshVisibility(x, (z+16));
-				if(hasChunk(x, (z-16)))
+					refreshMeshSide(x, (z+16), 1);
+				}
+				if(hasChunk(x, (z-16))) {
 					refreshVisibility(x, (z-16));
-				if(hasChunk((x+16), z))
+					refreshMeshSide(x, (z-16), 0);
+				}
+				if(hasChunk((x+16), z)) {
 					refreshVisibility((x+16), z);
-				if(hasChunk((x-16), z))
+					refreshMeshSide((x+16), z, 3);
+				}
+				if(hasChunk((x-16), z)) {
 					refreshVisibility((x-16), z);
+					refreshMeshSide((x-16), z, 2);
+				}
 				mutexRender.unlock();
-				
+
 				//Mesh erstellen
 				refreshMesh(x,z);
 
@@ -222,11 +229,9 @@ cubiverse::World_Chunk::pointer_t cubiverse::World::mapGenerator(int p_x, int p_
 */	
 void cubiverse::World::delChunk(int x, int z) {
 	if(hasChunk(x,z)) {
-		mutexRender.lock();
 		getChunk(x,z)->mesh->deleteMesh();
 		getChunk(x,z)->mesh_water->deleteMesh(); 
 		m_chunks.erase(make_pair(x,z)); 
-		mutexRender.unlock();
 	}
 }
 
@@ -242,12 +247,11 @@ void cubiverse::World::render(int playerX, int playerZ) {
 			if(hasChunk(x_chunk,z_chunk) ) {
 				if(getChunk(x_chunk,z_chunk)->mesh->isrender()) {
 					// ---- Draw one Chunk ---
-					glTranslatef(x_chunk, 0.0f, z_chunk);		
 					renderChunk(x_chunk, z_chunk);
-					glTranslatef(-x_chunk, 0.0f, -z_chunk);
 				}
-				else if(!generateChunk(x+playerX, z+playerZ)) {
+				else/* if(!generateChunk(x+playerX, z+playerZ))*/ {
 					//Update the Meshs arround 
+
 					if(hasChunk((x_chunk+16), z_chunk) && getChunk((x_chunk+16), z_chunk)->mesh->isrender()) 
 						updateMesh((x_chunk+16), z_chunk);
 					if(hasChunk((x_chunk-16), z_chunk) && getChunk((x_chunk-16), z_chunk)->mesh->isrender())
@@ -268,10 +272,8 @@ void cubiverse::World::render(int playerX, int playerZ) {
 			int x_chunk = (x-playerX);
 			int z_chunk = (z-playerZ);
 			if(hasChunk(x_chunk,z_chunk) ) {
-				if(getChunk(x_chunk,z_chunk)->mesh->isrender()) {
-					glTranslatef(x_chunk, 0.0f, z_chunk);	
+				if(getChunk(x_chunk,z_chunk)->mesh_water->isrender()) {
 					renderChunkWater(x_chunk, z_chunk);
-					glTranslatef(-x_chunk, 0.0f, -z_chunk);
 				}
 			}
 		}
@@ -286,6 +288,7 @@ void cubiverse::World::refreshMesh(int p_x, int p_z) {
 	vector<Vertex> vertices, vertices_water;
 	vector<GLuint> indices, indices_water;
 	//Zuerst alle Blöcke, falls sichtbar, zu einer Mesh verknüpfen
+	//cout << "GenerateMesh" << p_x << " : " << p_z << endl;
 	for(int x=0; x < 16; x++){
 		for(int z=0; z < 16; z++){	
 			for(int y=0; y < 128; y++) {
@@ -308,6 +311,41 @@ void cubiverse::World::refreshMesh(int p_x, int p_z) {
 	getChunk(p_x,p_z)->mesh_water->setIndices(indices_water);
 	mutexRender.unlock();
 }
+/* 
+ * Erneuert die Seite einer Mesh
+ * 1: vorne 2: hinten 3:rechts 4:links
+ */
+void cubiverse::World::refreshMeshSide(int p_x, int p_z, int side) {
+	//if(getChunk(p_x,p_z)->mesh->isrender()) {
+		mutexRefreshVisible.lock();
+		vector<Vertex>* vertices = getChunk(p_x, p_z)->mesh->getVertices();
+		vector<Vertex>* vertices_water = getChunk(p_x, p_z)->mesh_water->getVertices();
+		vector<GLuint>* indices = getChunk(p_x, p_z)->mesh->getIndices();
+		vector<GLuint>* indices_water = getChunk(p_x, p_z)->mesh_water->getIndices();
+
+		for(int a=0; a < 16; a++) {
+			for(int y=0; y < 128; y ++) {
+				if(side == 0) {
+					if(getChunk(p_x,p_z)->getBlockType(a,y,15) == 1)
+						getChunk(p_x,p_z)->getCube(a,y,15)->renderToMesh(p_x+a,y,p_z+15,vertices,indices);
+				}	
+				else if(side == 1) {
+					if(getChunk(p_x,p_z)->getBlockType(a,y,0) == 1)
+						getChunk(p_x,p_z)->getCube(a,y,0)->renderToMesh(p_x+a,y,p_z,vertices,indices);
+				}
+				else if(side == 2) {
+					if(getChunk(p_x,p_z)->getBlockType(15,y,a) == 1)
+						getChunk(p_x,p_z)->getCube(15,y,a)->renderToMesh(p_x+15,y,p_z+a,vertices,indices);
+				}
+				else if(side == 3) {
+					if(getChunk(p_x,p_z)->getBlockType(0,y,a) == 1)
+						getChunk(p_x,p_z)->getCube(0,y,a)->renderToMesh(p_x,y,p_z+a,vertices,indices);
+				}
+			}
+		}
+		mutexRefreshVisible.unlock();
+	//}	
+}
 /*
  * Erstellt eine Mesh
  * und gib diese der Grafikkarte
@@ -322,14 +360,12 @@ void cubiverse::World::createMesh(int x, int z){
 /* 
  * Update einer Mesh
  */
-void cubiverse::World::updateMesh(int x, int z){
-	if(hasChunk(x,z)) {
-		refreshMesh(x,z);
-
-		mutexRender.lock();
-		getChunk(x,z)->mesh->updateMesh();
-		getChunk(x,z)->mesh_water->updateMesh();
-		mutexRender.unlock();
+void cubiverse::World::updateMesh(int p_x, int p_z){
+	if(hasChunk(p_x,p_z)) {
+		mutexRefreshVisible.lock();
+		getChunk(p_x,p_z)->mesh->updateMesh();
+		getChunk(p_x,p_z)->mesh_water->updateMesh();
+		mutexRefreshVisible.unlock();
 	}
 }
 

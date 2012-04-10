@@ -34,6 +34,8 @@ class Bsb_Mesh:Bsb_Object{
     	void setIndices(vector<GLuint> p_indices);
 	bool isrender() { return isRender; }
 	bool existdata() { return existData; }
+	vector<Vertex>* getVertices() { return &vertices; }
+	vector<GLuint>* getIndices() { return &indices; }
 };
 
 // Location/Normals

@@ -65,7 +65,7 @@ void cubiverse::Game::init(){
 	GUI = boost::make_shared<cubiverse::GUI>(width, height);
 
 	// First Person Kamera initialisieren
-	myCamera=new Bsb_FPCamera(0,100,0);
+	myCamera=new Bsb_FPCamera(0,-100,0);
 
 	//Position des einen Lichts, das wir haben
 	GLfloat light_position[] = { 0.35, 0.5f, 0.15, 0.0 };
@@ -139,8 +139,9 @@ void cubiverse::Game::render()
 	myCamera->lookThrough(); //Wir schauen durch die Kamera
 	glEnable(GL_LIGHTING); //Licht an	
 	glLightfv(GL_LIGHT0, GL_POSITION, light_position); //Lichtposition wird gesetzt TODO in Lichtklasse auslagern
-	glLightfv(GL_LIGHT1, GL_POSITION, light_position2); //Lichtposition wird gesetzt TODO in Lichtklasse auslagern	
+	//glLightfv(GL_LIGHT1, GL_POSITION, light_position2); //Lichtposition wird gesetzt TODO in Lichtklasse auslagern
 	glClearColor(0.0,0.0,0.0,0.0);
+
 
 	glDisable(GL_TEXTURE_2D);
 	
@@ -155,7 +156,7 @@ void cubiverse::Game::render()
 		this->test_world->addChunksToList(-playerX, -playerZ);
                 //Chunks außerhalb der sich löschen
                 cout << "Player X:" << playerX << "Z:" << playerZ << endl;
-                for(int i=-128; i < 128; i++) {
+                for(int i=-128; i < 128; i+=16) {
                         test_world->delChunk((-playerX)+128, playerZ+i);
                         test_world->delChunk((-playerX)-128, playerZ+i);
                         test_world->delChunk(playerX+i, (-playerZ)+128);
@@ -168,7 +169,7 @@ void cubiverse::Game::render()
 
 	if(GUI->getMenu() == "Singleplayer" || GUI->getMenu() == "Multiplayer") {
 		if(!testWorldInit) {
-			test_world = boost::make_shared<cubiverse::World>(0.02, 64 , 6, 50);
+			test_world = boost::make_shared<cubiverse::World>(0.02, 64 , 3, 50);
 			testWorldInit = true;
 		}
 		else test_world->render(playerX, playerZ);
@@ -178,6 +179,20 @@ void cubiverse::Game::render()
 		voxelEditor->render(-myCamera->position->x, -myCamera->position->y, -myCamera->position->z);
 
 	switchToOrtho();// Das HUD wollen wir in 2D zeichnen
+	//Falls der Spieler unter Wasser taucht, Bild blau färben
+	//TODO: verschiedene wasserhöhen
+	if(myCamera->position->y >= -50) {
+		glBlendFunc(GL_SRC_COLOR, GL_DST_COLOR);
+		glColor4f(0.3, 0.3, 1.0, 0.1);
+		glBegin(GL_QUADS);
+			glVertex3f(0.0f, 0.0f, 0.0f);  
+			glVertex3f(width, 0.0, 0.0f);
+			glVertex3f(width, height, 0.0f);  
+			glVertex3f(0.0f, height, 0.0f);
+		glEnd();
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
+	 }
+
 	//GUI zeichnen
 	GUI->draw();
 
@@ -244,7 +259,6 @@ void cubiverse::Game::mouse_event(int button, int state, int x, int y){
 	if(button == 0) {
 		string menu = GUI->checkButton(x,y);
 		GUI->changeMenu(menu);
-		cout << menu << endl;
 		if(menu == "Main") {
 			showCursor();
 		}
