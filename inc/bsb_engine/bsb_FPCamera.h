@@ -26,5 +26,6 @@ class Bsb_FPCamera: public Bsb_Camera{
 		void down();
 		void move(float time);
 		void lookThrough();
+		void gravitation(float force, float time);
 };
 #endif

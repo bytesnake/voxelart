@@ -74,7 +74,7 @@ void cubiverse::Game::init(){
 	GLfloat light_ambient  [] = {0.1, 0.1, 0.1, 1.0};
 	GLfloat light_diffuse [] = {0.2, 0.2, 0.2, 1.0};
 	GLfloat light_ambient2  [] = {0.0, 0.0, 0.0, 1.0};
-	GLfloat light_diffuse2 [] = {-0.2, -0.2, -0.2, 1.0};
+	GLfloat light_diffuse2 [] = {-0.1, -0.1, -0.1, 1.0};
 	// Licht aufsetzen und anschalten TODO in Lichtklasse auslagern
 	glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
@@ -103,12 +103,39 @@ void cubiverse::Game::init(){
 
 //TODO: Collision/Real running
 void cubiverse::Game::movePlayer() {
-	int oldtime = clock(); 
+	boost::posix_time::ptime starttime = boost::posix_time::microsec_clock::local_time(); 
 	while(true) {
-		//cout << clock()-oldtime << endl << endl;
-                if(clock()-oldtime > 20000) {
-                        oldtime = clock();
-			myCamera->move(0.02);
+		boost::posix_time::time_duration timeDiff = boost::posix_time::microsec_clock::local_time() - starttime;
+                if(timeDiff.total_milliseconds() > 20) {
+                        starttime = boost::posix_time::microsec_clock::local_time(); 
+			if(testWorldInit) {
+				int playerX = (int)myCamera->position->x;
+				int playerZ = (int)myCamera->position->z;
+				if(playerX > 0) playerX += 16-playerX%16;
+				else playerX += -playerX%16;
+				if(playerZ > 0) playerZ += 16-playerZ%16;
+				else playerZ += -playerZ%16;
+				playerX = -playerX;
+				playerZ = -playerZ;
+
+				int blockPosX = -(int)myCamera->position->x%16;
+				if(blockPosX < 0)  blockPosX += 16;
+				int blockPosZ = -(int)myCamera->position->z%16;
+				if(blockPosZ < 0)  blockPosZ += 16;
+				myCamera->gravitation(200, timeDiff.total_milliseconds());
+				if(-myCamera->position->y < 127 && test_world->hasChunk(playerX, playerZ) && test_world->getChunk(playerX, playerZ)->
+								getBlockType( blockPosX, -(int)myCamera->position->y-1,  blockPosZ) == 2) {
+					myCamera->stopFall();
+					myCamera->gravitation(150, timeDiff.total_milliseconds());
+				}
+				if(-myCamera->position->y < 127 && test_world->hasChunk(playerX, playerZ) && test_world->getChunk(playerX, playerZ)->
+								getBlockType( blockPosX, -(int)myCamera->position->y-5,  blockPosZ) == 1) {
+					myCamera->stopFall();
+				}
+				//if(test_world->hasChunk(playerX, playerZ) && test_world->getChunk(playerX, playerZ)->getBlockType( blockPosX, -(int)myCamera->position->y,  blockPosZ) == 1) {
+					
+			}
+			myCamera->move(0.01);
 		}
 		boost::this_thread::sleep(boost::posix_time::milliseconds(10));
 	}
@@ -117,16 +144,16 @@ void cubiverse::Game::movePlayer() {
 void cubiverse::Game::update(float p_seconds)
 {
 	if(k_left){
-		myCamera->strafeLeft(2);
+		myCamera->strafeLeft(1);
 	}
 	if(k_right){
-		myCamera->strafeRight(2);
+		myCamera->strafeRight(1);
 	}
 	if(k_up){
-		myCamera->walkForward(2);
+		myCamera->walkForward(1);
 	}
 	if(k_down){
-		myCamera->walkBackwards(2);
+		myCamera->walkBackwards(1);
 	}
 
 }
@@ -139,7 +166,7 @@ void cubiverse::Game::render()
 	myCamera->lookThrough(); //Wir schauen durch die Kamera
 	glEnable(GL_LIGHTING); //Licht an	
 	glLightfv(GL_LIGHT0, GL_POSITION, light_position); //Lichtposition wird gesetzt TODO in Lichtklasse auslagern
-	//glLightfv(GL_LIGHT1, GL_POSITION, light_position2); //Lichtposition wird gesetzt TODO in Lichtklasse auslagern
+	glLightfv(GL_LIGHT1, GL_POSITION, light_position2); //Lichtposition wird gesetzt TODO in Lichtklasse auslagern
 	glClearColor(0.0,0.0,0.0,0.0);
 
 
@@ -169,7 +196,8 @@ void cubiverse::Game::render()
 
 	if(GUI->getMenu() == "Singleplayer" || GUI->getMenu() == "Multiplayer") {
 		if(!testWorldInit) {
-			test_world = boost::make_shared<cubiverse::World>(0.02, 64 , 3, 50);
+			//test_world = boost::make_shared<cubiverse::World>(0.01, 64 , 4, 50);
+			test_world = boost::make_shared<cubiverse::World>(0.04, 32 , 1, 50);
 			testWorldInit = true;
 		}
 		else test_world->render(playerX, playerZ);
@@ -181,7 +209,7 @@ void cubiverse::Game::render()
 	switchToOrtho();// Das HUD wollen wir in 2D zeichnen
 	//Falls der Spieler unter Wasser taucht, Bild blau färben
 	//TODO: verschiedene wasserhöhen
-	if(myCamera->position->y >= -50) {
+	if((GUI->getMenu() == "Singleplayer" || GUI->getMenu() == "Multiplayer") && myCamera->position->y >= -51) {
 		glBlendFunc(GL_SRC_COLOR, GL_DST_COLOR);
 		glColor4f(0.3, 0.3, 1.0, 0.1);
 		glBegin(GL_QUADS);

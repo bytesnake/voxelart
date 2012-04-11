@@ -13,12 +13,14 @@ class worldGenerator
 		Perlin* noiseGen;
 		Perlin* noiseColor;
 		Perlin* noiseTree;
+		Perlin* noiseCaves;
 	
 	public:
 	worldGenerator(double p_frequency, double p_high, int p_octaves, int p_seed);
 	double getNoiseHeight(int p_x, int p_z, int p_y);
 	double getNoiseColor(int p_x, int p_z);
 	double getTreeMap(int p_x, int p_z);
+	double getCavesMap(int p_x, int p_z, int p_y);
 
 
 };

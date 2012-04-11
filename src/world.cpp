@@ -27,8 +27,6 @@ cubiverse::World::World(float freq, int height, int octaves, int seed) {
 	addChunksToList(0, 0);	
 	//Starte die Threads
 	groupRender.create_thread( boost::bind( &cubiverse::World::generateThread, this));
-	groupRender.create_thread( boost::bind( &cubiverse::World::generateThread, this));
-	groupRender.create_thread( boost::bind( &cubiverse::World::generateThread, this));
 }
 
 /*
@@ -172,13 +170,26 @@ cubiverse::World_Chunk::pointer_t cubiverse::World::mapGenerator(int p_x, int p_
 		for(int z=0; z < 16; z++)
 			colorMap[x][z] = testGen->getNoiseColor(p_x+x, p_z+z);
 
+		//CavesMap
+		int cavesMap[16][16][128];
+		for(int x=0; x < 16; x++)
+		for(int z=0; z < 16; z++)
+		for(int y=0; y < 128; y++)
+			cavesMap[x][z][y] = testGen->getCavesMap(p_x+x,p_z+z, y)+64;
+
 		cubiverse::World_Chunk::pointer_t newChunk = boost::make_shared<cubiverse::World_Chunk>();		
 
 		for(int x=0; x < 16; x++) {
 			for(int z=0; z < 16; z++) {
 				int height=500; 
 				for(int y=0; y<=127; y++) {	//andersrum
-					if(y < heightMap[x][z][y]) {
+					/*if(y == 1) {
+						newChunk->m_blockType[BLOCK_INDEX(x,y,z)] = 1;
+						Cube::pointer_t newCube = boost::make_shared<Cube>(1);
+						newCube->setColor(0.0f, 0.0f, 0.0f, 1.0f);
+					}
+					else*/ if(y < heightMap[x][z][y] && (55 < cavesMap[x][z][y])) {
+					//if() {
 
 						newChunk->m_blockType[BLOCK_INDEX(x,y,z)] = 1;
 						Cube::pointer_t newCube = boost::make_shared<Cube>(1);
@@ -187,9 +198,10 @@ cubiverse::World_Chunk::pointer_t cubiverse::World::mapGenerator(int p_x, int p_
 						// wenn block drüber besetzt: braun
 						// sonst: grün
 						if(!((y+1) < heightMap[x][z][y+1]) && y >= 50){
-							newCube->setColor(0.2+(colorMap[x][z] / 256.0f),0.5-(colorMap[x][z] / 128.0f),0.2f-(colorMap[x][z] / 256.0f),1.0f);
+							newCube->setColor(0.1+(colorMap[x][z] / 256.0f),0.4-(colorMap[x][z] / 128.0f),0.1f-(colorMap[x][z] / 256.0f),1.0f);
 						}else{
-							newCube->setColor(y/192.0f,0.3f,0.2f,1.0f);
+							//newCube->setColor(y/192.0f,0.3f,0.2f,1.0f);
+							newCube->setColor((float)50/(float)255,(float)49/(float)255,(float)19/(float)255, 1.0f);
 						}
 						//newCube->setColor(0.2f,y/128.0f,0.2f,1.0f);
 						//newCube->setColor(0.2f, pow((((float)y+1.0f)/128.0f), 2), 0.2f, 0.1f);
@@ -374,6 +386,7 @@ void cubiverse::World::updateMesh(int p_x, int p_z){
  */
 void cubiverse::World::renderChunk(int p_x, int p_z) {
 	if(hasChunk(p_x, p_z)) {
+		glBlendFunc(GL_SRC_COLOR,  GL_ONE_MINUS_SRC_ALPHA);
 		getChunk(p_x, p_z)->mesh->render();
 	}
 }

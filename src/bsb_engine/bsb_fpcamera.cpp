@@ -33,8 +33,9 @@
         }        
     }
 
-    void Bsb_FPCamera::stopFall()  {	
-	m_speed->y=0;
+    void Bsb_FPCamera::stopFall()  {
+	if(m_speed->y > 0)	
+		m_speed->y=0;
     }
 
     //moves the camera forward relative to its current rotation (yaw)
@@ -70,18 +71,22 @@
     }
 
     void Bsb_FPCamera::jump(){
-    	position->y-=1;
+	if(m_speed->y > -100)
+    		m_speed->y-=80;
     }
     void Bsb_FPCamera::down(){
     	position->y+=1;
-    }    
+    } 
+    void Bsb_FPCamera::gravitation(float force, float time) {
+	m_speed->y += force*(time/1000);
+    }   
 
     void Bsb_FPCamera::move(float time) {
 	position->z+=m_speed->z*time;
 	position->x+=m_speed->x*time;
 	position->y+=m_speed->y*time;
-	m_speed->div(1.08);
-	//m_speed->y += 9.81*time;	
+	m_speed->z /= 1.2;
+	m_speed->x /= 1.2;
     }
     void Bsb_FPCamera::lookThrough()
     {
