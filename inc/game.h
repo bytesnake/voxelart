@@ -1,8 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "bsb_engine/bsb_game.h"
-//#include "cube.h"
+#include "voxelart_engine/game.h"
 #include "PlayerBody.h"
 #include "world.h"
 #include "GUI.h"
@@ -22,7 +21,7 @@
 using namespace std;
 
 namespace cubiverse {
-	class Game:public Bsb_Game{
+	class Game:public vaEngine::Game{
 		public:
 			typedef boost::shared_ptr<cubiverse::Game> pointer_t;
 

@@ -2,7 +2,7 @@
 #define CUBE_H
 
 #include <boost/shared_ptr.hpp>
-#include "bsb_engine/bsb_mesh.h"
+#include "voxelart_engine/mesh.h"
 
 //#include "world.h"
 
@@ -21,8 +21,8 @@
 #define B_POS 2
 #define A_POS 3
 
-#ifndef BSB_MESH_H
-#define BSB_MESH_H
+#ifndef VOXELART_MESH_H
+#define VOXELART_MESH_H
 // Vertex structure
 struct Vertex
 {

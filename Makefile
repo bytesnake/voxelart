@@ -18,7 +18,7 @@ else
 endif
 
 #BINDIR=bin
-SRCS = $(wildcard src/*.cpp src/bsb_engine/*.cpp)
+SRCS = $(wildcard src/*.cpp src/voxelart_engine/*.cpp)
 OBJS = $(patsubst src/%.cpp,$(BINDIR)/%.o,$(SRCS))
 
 game: $(OBJS)

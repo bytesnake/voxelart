@@ -7,8 +7,8 @@
 #include "cube.h"
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
-#include "bsb_engine/bsb_mesh.h"
-	
+#include "voxelart_engine/mesh.h"
+#include "voxelart_engine/vector.h"
 
 namespace cubiverse {
 
@@ -40,7 +40,7 @@ namespace cubiverse {
 			std::vector<voxelList_t> voxels;
 			std::vector<joint> joints;
 			std::vector<action> actions;
-			std::vector<Bsb_Mesh*> meshs;
+			std::vector<vaEngine::Mesh*> meshs;
 
 			int idColor;
 		public:
@@ -63,7 +63,7 @@ namespace cubiverse {
 			void render(float playerX, float playerY, float playerZ);
 			void key_pressed(unsigned char key);
 
-			Bsb_Vector* checkCollision(float x, float y, float z); 
+			vaEngine::Vector checkCollision(float x, float y, float z); 
 
 			void createMesh(int group);
 			void updateMeshInfo(int group);

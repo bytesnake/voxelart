@@ -1,0 +1,48 @@
+#ifndef VOXELART_VECTOR_H
+#define VOXELART_VECTOR_H
+
+#include <math.h>
+
+namespace vaEngine {
+	class Vector
+	{
+
+		public:
+		    float x;
+		    float y;
+		    float z;
+
+		    Vector();
+	    	    Vector(float p_x,float p_y,float p_z);
+		    Vector& operator+(Vector* b);
+		    Vector& operator-(Vector* b);
+		    Vector& operator*(Vector* b);
+		    Vector& operator*(float b);
+		    Vector& operator/(Vector* b);
+		    Vector& operator/(float b);
+		
+		    float length();
+		    void normalize();
+		    float scal_prod(Vector* b);
+		    float dot(Vector* b);
+		    Vector* cross(Vector* b);
+		    float angle(Vector* b);
+		/*
+		    void add(Bsb_Vector* b);
+		    void sub(Bsb_Vector* b);
+		    void mul(Bsb_Vector* b);
+			void div(Bsb_Vector* b);
+			void div(float c);
+			void mul(float c);
+			float scal_prod(Bsb_Vector* b);
+			float length();
+			float length_sq();
+			void normalize();
+			Bsb_Vector* cross(Bsb_Vector* b);
+			float dot(Bsb_Vector* b);
+			float angle(Bsb_Vector* b);
+		*/
+	};
+}
+
+#endif

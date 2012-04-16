@@ -42,7 +42,7 @@ void cubiverse::VoxelEditor::render(float playerX, float playerY, float playerZ)
 		glVertex3f( x, 20.0f, z );
 	}
 
-	Bsb_Vector* coll = checkCollision(playerX, playerY, playerZ);
+	vaEngine::Vector coll = checkCollision(playerX, playerY, playerZ);
 	//if(coll->y != playerY) {
 	//	Cube::pointer_t newCube = boost::make_shared<Cube>(1);
 	//	voxels[0][make_pair(coll->x,make_pair(coll->y,coll->z))] = newCube;
@@ -59,24 +59,24 @@ void cubiverse::VoxelEditor::render(float playerX, float playerY, float playerZ)
 	//}
 }
 
-Bsb_Vector* cubiverse::VoxelEditor::checkCollision(float p_x, float p_y, float p_z) {
+vaEngine::Vector cubiverse::VoxelEditor::checkCollision(float p_x, float p_y, float p_z) {
 	float matrix[16];
 	glGetFloatv( GL_MODELVIEW_MATRIX, matrix );
-	Bsb_Vector* camera= new Bsb_Vector( matrix[2], matrix[6], matrix[10] );
-	camera->div(2.0f);
+	vaEngine::Vector camera( matrix[2], matrix[6], matrix[10] );
+	camera = camera / 2.0f;
 
-	Bsb_Vector* camPos = new Bsb_Vector(p_x, p_y, p_z);
+	vaEngine::Vector camPos(p_x, p_y, p_z);
 
-	cout << "X:" << camera->x << " Y:" << camera->y << " Z:" << camera->z << endl;
-	if(p_y > 20 && camera->y > 0) {
+	cout << "X:" << camera[0] << " Y:" << camera[1] << " Z:" << camera[2] << endl;
+	if(p_y > 20 && camera.y > 0) {
 		bool run = true;
-		while(camPos->y > 20 && run) {
-			camPos->sub(camera);
+		while(camPos.y > 20 && run) {
+			camPos = camPos - camera;
 			for(int mesh = 0; mesh < meshs.size(); mesh++) {
-				if(hasVoxel(camPos->x,camPos->y,camPos->z, mesh)) run = false;
+				if(hasVoxel(camPos.x,camPos.y,camPos.z, mesh)) run = false;
 			}
 		}
-		cout << "FOUND POS:" << camPos->x  << " : " << camPos->z << endl;
+		cout << "FOUND POS:" << camPos.x  << " : " << camPos.z << endl;
 		return camPos;
 	}			
 	

@@ -1,11 +1,13 @@
 #ifndef GUI_H
 #define GUI_H
 
-#include "bsb_engine/bsb_game.h"
+#include "voxelart_engine/font.h"
 #include <boost/signal.hpp> 
 #include <boost/bind.hpp>
 #include <vector>
+#include <iostream>
 
+using namespace std;
 namespace cubiverse {
 	class GUI {
 		public:
@@ -19,7 +21,7 @@ namespace cubiverse {
 		private:
 			string menu;
 			int width, height;
-			Bsb_Font* std_font;
+			vaEngine::Font* std_font;
 
 			void drawMenu();
 			void drawMap();

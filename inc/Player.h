@@ -2,22 +2,23 @@
 #define Player_H
 
 #include <iostream>
-#include "bsb_engine/bsb_game.h"
+#include "voxelart_engine/fpcamera.h"
+#include "voxelart_engine/vector.h"
 
 class Player
 {
 	private:
-		Bsb_Vector* m_speed;
-		Bsb_Vector* m_acc;
+		vaEngine::Vector m_speed;
+		vaEngine::Vector m_acc;
 		float m_atten;
 		float m_yaw, m_pitch;
-		Bsb_FPCamera* m_camera;
+		vaEngine::FPCamera m_camera;
 	public:
 		Player();
-		Bsb_Vector* getSpeed() { return m_speed; }
-		Bsb_Vector* getAcc() { return m_acc; }
-		void addSpeed(Bsb_Vector* speed) { m_speed->add(speed); }
-		void addAcc(Bsb_Vector* acc) { m_acc->add(acc); }
+		vaEngine::Vector getSpeed() { return m_speed; }
+		vaEngine::Vector getAcc() { return m_acc; }
+		void addSpeed(vaEngine::Vector speed) { m_speed = m_speed + speed; }
+		void addAcc(vaEngine::Vector acc) { m_acc = m_acc + acc; }
 		void setAtt(float atten) { m_atten = atten; }
 
 		void move(float time);

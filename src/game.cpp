@@ -10,13 +10,10 @@
 // - 21.02.12: Code aufgeräumt (bit)
 // - 22.02.12: Chunks werden nun gerendert
 // - 22.02.12: Aggressive aufgeräumt
-// - 25.03.12: Namespaces/smartPointer/unbennung in Cubiverse
+// - 25.03.12: Namespaces/smartPointer/unbennung in Voxelart
 
-int frames;
-int lastframe;
-int triangles;
 
-Bsb_FPCamera* myCamera;
+vaEngine::FPCamera* myCamera;
                      
 //Position des einen Lichts, das wir haben
 
@@ -65,7 +62,7 @@ void cubiverse::Game::init(){
 	GUI = boost::make_shared<cubiverse::GUI>(width, height);
 
 	// First Person Kamera initialisieren
-	myCamera=new Bsb_FPCamera(0,-100,0);
+	myCamera=new vaEngine::FPCamera(0,-100,0);
 
 	//Position des einen Lichts, das wir haben
 	GLfloat light_position[] = { 0.35, 0.5f, 0.15, 0.0 };
@@ -109,8 +106,8 @@ void cubiverse::Game::movePlayer() {
                 if(timeDiff.total_milliseconds() > 20) {
                         starttime = boost::posix_time::microsec_clock::local_time(); 
 			if(testWorldInit) {
-				int playerX = (int)myCamera->position->x;
-				int playerZ = (int)myCamera->position->z;
+				int playerX = (int)myCamera->position.x;
+				int playerZ = (int)myCamera->position.z;
 				if(playerX > 0) playerX += 16-playerX%16;
 				else playerX += -playerX%16;
 				if(playerZ > 0) playerZ += 16-playerZ%16;
@@ -118,19 +115,23 @@ void cubiverse::Game::movePlayer() {
 				playerX = -playerX;
 				playerZ = -playerZ;
 
-				int blockPosX = -(int)myCamera->position->x%16;
+				int blockPosX = -(int)myCamera->position.x%16;
 				if(blockPosX < 0)  blockPosX += 16;
-				int blockPosZ = -(int)myCamera->position->z%16;
+				int blockPosZ = -(int)myCamera->position.z%16;
 				if(blockPosZ < 0)  blockPosZ += 16;
-				myCamera->gravitation(200, timeDiff.total_milliseconds());
-				if(-myCamera->position->y < 127 && test_world->hasChunk(playerX, playerZ) && test_world->getChunk(playerX, playerZ)->
-								getBlockType( blockPosX, -(int)myCamera->position->y-1,  blockPosZ) == 2) {
-					myCamera->stopFall();
-					myCamera->gravitation(150, timeDiff.total_milliseconds());
+				myCamera->addSpeedY(200 * timeDiff.total_milliseconds()/1000);
+				if(-myCamera->position.y < 127 && test_world->hasChunk(playerX, playerZ) && test_world->getChunk(playerX, playerZ)->
+								getBlockType( blockPosX, -(int)myCamera->position.y-1,  blockPosZ) == 2) {
+					myCamera->setSpeedY(0);
+					myCamera->addSpeedY(150 * timeDiff.total_milliseconds()/1000);
 				}
-				if(-myCamera->position->y < 127 && test_world->hasChunk(playerX, playerZ) && test_world->getChunk(playerX, playerZ)->
-								getBlockType( blockPosX, -(int)myCamera->position->y-5,  blockPosZ) == 1) {
-					myCamera->stopFall();
+				if(-myCamera->position.y < 127 && test_world->hasChunk(playerX, playerZ) && test_world->getChunk(playerX, playerZ)->
+								getBlockType( blockPosX, -(int)myCamera->position.y-5,  blockPosZ) == 1) {
+					myCamera->setSpeedY(0);
+				}
+				if(myCamera->jump) {
+					myCamera->addSpeedY(-100);
+					myCamera->jump = false;
 				}
 				//if(test_world->hasChunk(playerX, playerZ) && test_world->getChunk(playerX, playerZ)->getBlockType( blockPosX, -(int)myCamera->position->y,  blockPosZ) == 1) {
 					
@@ -172,8 +173,8 @@ void cubiverse::Game::render()
 
 	glDisable(GL_TEXTURE_2D);
 	
-	int playerX = ((int)myCamera->position->x-(int)myCamera->position->x%16);
-	int playerZ = ((int)myCamera->position->z-(int)myCamera->position->z%16);
+	int playerX = ((int)myCamera->position.x-(int)myCamera->position.x%16);
+	int playerZ = ((int)myCamera->position.z-(int)myCamera->position.z%16);
 
 	//Falls sich die Position des Spieler um 16 in X/Z geändert hat
 	if(playerX != oldPlayerX || playerZ != oldPlayerZ) {
@@ -204,12 +205,12 @@ void cubiverse::Game::render()
 	}
 
 	else if(GUI->getMenu() == "Voxel")
-		voxelEditor->render(-myCamera->position->x, -myCamera->position->y, -myCamera->position->z);
+		voxelEditor->render(-myCamera->position.x, -myCamera->position.y, -myCamera->position.z);
 
 	switchToOrtho();// Das HUD wollen wir in 2D zeichnen
 	//Falls der Spieler unter Wasser taucht, Bild blau färben
 	//TODO: verschiedene wasserhöhen
-	if((GUI->getMenu() == "Singleplayer" || GUI->getMenu() == "Multiplayer") && myCamera->position->y >= -51) {
+	if((GUI->getMenu() == "Singleplayer" || GUI->getMenu() == "Multiplayer") && myCamera->position.y >= -51) {
 		glBlendFunc(GL_SRC_COLOR, GL_DST_COLOR);
 		glColor4f(0.3, 0.3, 1.0, 0.1);
 		glBegin(GL_QUADS);
@@ -228,7 +229,7 @@ void cubiverse::Game::render()
 	glLoadIdentity();
 	glEnable(GL_TEXTURE_2D);
 	glColor4f(1.0f,1.0f,1.0f,1.0f);//Schriftfarbe auf weiß setzen
-	GUI->drawFPS(currentFPS);
+	GUI->drawFPS(FPS);
 	glDisable(GL_TEXTURE_2D);
 	backToFrustum();//im nächsten Frame wollen wir wieder 3D malen	
 	glutSwapBuffers();//front- und back-buffer vertauschen => Das Bild wird angezeigt :) 
@@ -242,13 +243,13 @@ void cubiverse::Game::key_pressed(unsigned char key){
 			showCursor();
 			break;
 		case ' ':
-			myCamera->jump();//TODO in die Spielerklasse auslagern und die Position der Kamera von Spieler abhängig machen
+			myCamera->jump = true;//TODO in die Spielerklasse auslagern und die Position der Kamera von Spieler abhängig machen
 			break;
 		case 'r':
 			voxelEditor->checkCollision(0, 30, 10);
 			break;
 		case 'q':
-			myCamera->down();
+			//myCamera->down();
 			break;
 		case 'w':
 			k_up=true;

@@ -120,7 +120,7 @@ void cubiverse::GUI::drawFPS(int fps) {
 }
 	
 cubiverse::GUI::GUI(int width, int height) {
-	this->std_font=new Bsb_Font("Data/test.png","Data/test.bfd");
+	this->std_font=new vaEngine::Font("Data/test.png","Data/test.bfd");
 
 	this->width = width;
 	this->height = height;
