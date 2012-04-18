@@ -241,8 +241,22 @@ cubiverse::World_Chunk::pointer_t cubiverse::World::mapGenerator(int p_x, int p_
 */	
 void cubiverse::World::delChunk(int x, int z) {
 	if(hasChunk(x,z)) {
-		getChunk(x,z)->mesh->deleteMesh();
 		m_chunks.erase(make_pair(x,z)); 
+	}
+}
+
+/**
+ * Erstellt die Texturen für das Wasser
+ */
+void cubiverse::World::renderWaterTextures(int playerX, int playerZ) {
+	for(int x=-128; x <= 128; x=x+16)
+	for(int z=-128; z <= 128; z=z+16) {
+		int x_chunk = (x-playerX);
+		int z_chunk = (z-playerZ);
+		if(hasChunk(x_chunk,z_chunk)) {
+			if(getChunk(x_chunk,z_chunk)->water->waterMesh->isrender()) 
+				getChunk(x_chunk, z_chunk)->water->RenderTextures();
+		}
 	}
 }
 
@@ -250,6 +264,7 @@ void cubiverse::World::delChunk(int x, int z) {
  * Rendert alle Chunks
  */
 void cubiverse::World::render(int playerX, int playerZ) { 
+
 	//Rendert die Chunks und erstellt falls nötig eine Mesh
 	for(int x=-128; x <= 128; x=x+16) {
 		for(int z=-128; z <= 128; z=z+16) {
@@ -320,6 +335,15 @@ void cubiverse::World::refreshMesh(int p_x, int p_z) {
 	getChunk(p_x,p_z)->mesh->setIndices(indices);
 	getChunk(p_x,p_z)->water->waterMesh->setVertices(vertices_water);
 	getChunk(p_x,p_z)->water->waterMesh->setIndices(indices_water);
+
+	std::vector<Mesh*> tmpMeshs;
+	int arround[] = {0,0,-16,0,-16,-16, 0, 16, 16, 16 };
+	for(int i=0; i < sizeof(arround)/sizeof(arround[0]); i = i+2) {
+		if(hasChunk(p_x+arround[i], p_z+arround[i+1])) {
+			tmpMeshs.push_back(getChunk(p_x+arround[i], p_z+arround[i+1])->mesh);
+		}
+	}
+	getChunk(p_x, p_z)->water->setArroundMesh(tmpMeshs);
 	mutexRender.unlock();
 }
 /* 
@@ -355,7 +379,6 @@ void cubiverse::World::refreshMeshSide(int p_x, int p_z, int side) {
 			}
 		}
 		mutexRefreshVisible.unlock();
-	//}	
 }
 /*
  * Erstellt eine Mesh
@@ -393,8 +416,8 @@ void cubiverse::World::renderChunk(int p_x, int p_z) {
 //TODO: Auf Texturen umstellen, immoment werden einfach die Farben kombiniert	
 void cubiverse::World::renderChunkWater(int p_x, int p_z) {
 	if(hasChunk(p_x, p_z)) {
-		getChunk(p_x, p_z)->water->RenderTextures();
-		getChunk(p_x, p_z)->water->RenderWater();
+		//getChunk(p_x, p_z)->water->RenderTextures();
+		//getChunk(p_x, p_z)->water->RenderWater();
 	}
 }
 

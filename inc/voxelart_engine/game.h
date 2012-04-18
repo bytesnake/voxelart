@@ -13,10 +13,10 @@
 #include "mesh.h"
 #include "camera.h"
 #include "fpcamera.h"
-#include "texture.h"
 #include "font.h"
 #include "sprite.h"
 #include "water.h"
+#include "texture.h"
 
 /**
  * Hauptklasse der Bsb Engine.

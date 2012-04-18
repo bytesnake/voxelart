@@ -53,8 +53,12 @@ namespace cubiverse {
 
 		World_Chunk() { 
 			mesh = new vaEngine::Mesh();
-			water = new vaEngine::Water(16, 50, "");
-		}					
+			water = new vaEngine::Water(16, 50, "../Data/normal_water.jpg");
+		}	
+	
+		~World_Chunk() {
+			mesh->deleteMesh();		
+		}		
 	};
 
 	class World {
@@ -77,6 +81,7 @@ namespace cubiverse {
 			void delChunk(int x, int z);
 
 			//Rendern eines Chunks
+			void renderWaterTextures(int p_x, int p_z);
 			void renderChunk(int p_x, int p_z);
 			void renderChunkWater(int p_x, int p_z);
 			void updateChunk(int p_x, int p_z);

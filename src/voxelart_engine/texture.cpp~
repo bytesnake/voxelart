@@ -1,6 +1,6 @@
 #include "../../inc/voxelart_engine/texture.h"
 
-vaEngine::Texture::Texture() {
+void vaEngine::Texture::Texture() {
 	GLuint tex_num;
 	// Allocates one texture handle
 	glGenTextures( 1, &tex_num);

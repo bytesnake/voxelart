@@ -36,14 +36,17 @@ namespace vaEngine {
 				this->size = size;
 				this->waterHeight = waterHeight;
 				this->normalMap = new Texture(normalMapName);
+				this->reflectionMap = new Texture();
+				this->refractionMap = new Texture();
+				this->depthMap = new Texture();
+				waterMesh = new Mesh();
 			}
 			void RenderWater();
 			void RenderTextures() {
 				RenderReflection();
 				RenderRefraction();
 			}
-			void setMesh(Mesh* water, std::vector<Mesh*> arroundMesh) {
-				this->waterMesh = water;
+			void setArroundMesh(std::vector<Mesh*> arroundMesh) {
 				this->arroundMesh = arroundMesh;
 				hasMesh = true;
 			}

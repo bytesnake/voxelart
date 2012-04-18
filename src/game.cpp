@@ -169,12 +169,21 @@ void cubiverse::Game::render()
 	glLightfv(GL_LIGHT0, GL_POSITION, light_position); //Lichtposition wird gesetzt TODO in Lichtklasse auslagern
 	glLightfv(GL_LIGHT1, GL_POSITION, light_position2); //Lichtposition wird gesetzt TODO in Lichtklasse auslagern
 	glClearColor(0.0,0.0,0.0,0.0);
-
-
 	glDisable(GL_TEXTURE_2D);
 	
 	int playerX = ((int)myCamera->position.x-(int)myCamera->position.x%16);
 	int playerZ = ((int)myCamera->position.z-(int)myCamera->position.z%16);
+
+	if(GUI->getMenu() == "Singleplayer" || GUI->getMenu() == "Multiplayer") {
+		if(testWorldInit) test_world->renderWaterTextures(playerX, playerZ);
+	}
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); 
+	glLoadIdentity();
+	myCamera->lookThrough(); 
+	glClearColor(0.0,0.0,0.0,0.0);
+	backToFrustum();
+	glDisable(GL_TEXTURE_2D);
 
 	//Falls sich die Position des Spieler um 16 in X/Z geändert hat
 	if(playerX != oldPlayerX || playerZ != oldPlayerZ) {

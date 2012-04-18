@@ -1,13 +1,12 @@
 #ifndef VOXELART_MESH_H
 #define VOXELART_MESH_H
 
+#include "texture.h"
+#include "vector.h"
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
-
-#include "texture.h"
-#include "vector.h"
 
 using namespace std;
 using namespace vaEngine;

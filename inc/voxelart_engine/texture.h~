@@ -7,7 +7,6 @@ namespace vaEngine {
 	class Texture{
 		public:
 			GLuint id;
-			Texture();
 			Texture(const char* filename);
 			Texture(const char* filename,bool inverted);
 			void bind();
