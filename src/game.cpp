@@ -136,7 +136,7 @@ void cubiverse::Game::movePlayer() {
 				//if(test_world->hasChunk(playerX, playerZ) && test_world->getChunk(playerX, playerZ)->getBlockType( blockPosX, -(int)myCamera->position->y,  blockPosZ) == 1) {
 					
 			}
-			myCamera->move(0.01);
+			myCamera->move(timeDiff.total_milliseconds()/(float)700);
 		}
 		boost::this_thread::sleep(boost::posix_time::milliseconds(10));
 	}
@@ -145,16 +145,16 @@ void cubiverse::Game::movePlayer() {
 void cubiverse::Game::update(float p_seconds)
 {
 	if(k_left){
-		myCamera->strafeLeft(1);
+		myCamera->strafeLeft(4);
 	}
 	if(k_right){
-		myCamera->strafeRight(1);
+		myCamera->strafeRight(4);
 	}
 	if(k_up){
-		myCamera->walkForward(1);
+		myCamera->walkForward(4);
 	}
 	if(k_down){
-		myCamera->walkBackwards(1);
+		myCamera->walkBackwards(4);
 	}
 
 }

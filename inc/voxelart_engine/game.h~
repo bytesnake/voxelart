@@ -87,14 +87,15 @@ namespace vaEngine {
 	};
 
 }
-	//Leider müssen hier ein paar statische umleitungen in die Klasse vorgenommen werden, da freeGLUT für C geschrieben wurde :(
-	 static vaEngine::Game* currentInstance;
-	 static void callRender() { currentInstance->render(); }
-	 static void callKeyPressed(unsigned char key, int x, int z) { currentInstance->key_pressed(key); }
-	 static void callKeyReleased(unsigned char key, int x, int z) { currentInstance->key_released(key); }
-	 static void callMouseEvent(int button, int state, int x, int y) { currentInstance->mouse_event(button, state, x, y); }
-	 static void callMouseMotion(int x, int y) { currentInstance->mouse_motion(x,y); } 
-	 static void callTimer(int) { currentInstance->timer(0); }
-	 static void callSpecialKeyPressed(int key, int x, int y) { currentInstance->specialkey_pressed(key, x, y); }
+
+//Leider müssen hier ein paar statische umleitungen in die Klasse vorgenommen werden, da freeGLUT für C geschrieben wurde :(
+static vaEngine::Game* currentInstance;
+static void callRender() { currentInstance->render(); }
+static void callKeyPressed(unsigned char key, int x, int z) { currentInstance->key_pressed(key); }
+static void callKeyReleased(unsigned char key, int x, int z) { currentInstance->key_released(key); }
+static void callMouseEvent(int button, int state, int x, int y) { currentInstance->mouse_event(button, state, x, y); }
+static void callMouseMotion(int x, int y) { currentInstance->mouse_motion(x,y); } 
+static void callTimer(int) { currentInstance->timer(0); }
+static void callSpecialKeyPressed(int key, int x, int y) { currentInstance->specialkey_pressed(key, x, y); }
 
 #endif

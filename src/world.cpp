@@ -242,7 +242,6 @@ cubiverse::World_Chunk::pointer_t cubiverse::World::mapGenerator(int p_x, int p_
 void cubiverse::World::delChunk(int x, int z) {
 	if(hasChunk(x,z)) {
 		getChunk(x,z)->mesh->deleteMesh();
-		getChunk(x,z)->mesh_water->deleteMesh(); 
 		m_chunks.erase(make_pair(x,z)); 
 	}
 }
@@ -284,7 +283,7 @@ void cubiverse::World::render(int playerX, int playerZ) {
 			int x_chunk = (x-playerX);
 			int z_chunk = (z-playerZ);
 			if(hasChunk(x_chunk,z_chunk) ) {
-				if(getChunk(x_chunk,z_chunk)->mesh_water->isrender()) {
+				if(getChunk(x_chunk,z_chunk)->water->waterMesh->isrender()) {
 					renderChunkWater(x_chunk, z_chunk);
 				}
 			}
@@ -319,8 +318,8 @@ void cubiverse::World::refreshMesh(int p_x, int p_z) {
 	}
 	getChunk(p_x,p_z)->mesh->setVertices(vertices);
 	getChunk(p_x,p_z)->mesh->setIndices(indices);
-	getChunk(p_x,p_z)->mesh_water->setVertices(vertices_water);
-	getChunk(p_x,p_z)->mesh_water->setIndices(indices_water);
+	getChunk(p_x,p_z)->water->waterMesh->setVertices(vertices_water);
+	getChunk(p_x,p_z)->water->waterMesh->setIndices(indices_water);
 	mutexRender.unlock();
 }
 /* 
@@ -331,9 +330,9 @@ void cubiverse::World::refreshMeshSide(int p_x, int p_z, int side) {
 	//if(getChunk(p_x,p_z)->mesh->isrender()) {
 		mutexRefreshVisible.lock();
 		vector<Vertex>* vertices = getChunk(p_x, p_z)->mesh->getVertices();
-		vector<Vertex>* vertices_water = getChunk(p_x, p_z)->mesh_water->getVertices();
+		vector<Vertex>* vertices_water = getChunk(p_x, p_z)->water->waterMesh->getVertices();
 		vector<GLuint>* indices = getChunk(p_x, p_z)->mesh->getIndices();
-		vector<GLuint>* indices_water = getChunk(p_x, p_z)->mesh_water->getIndices();
+		vector<GLuint>* indices_water = getChunk(p_x, p_z)->water->waterMesh->getIndices();
 
 		for(int a=0; a < 16; a++) {
 			for(int y=0; y < 128; y ++) {
@@ -363,9 +362,9 @@ void cubiverse::World::refreshMeshSide(int p_x, int p_z, int side) {
  * und gib diese der Grafikkarte
  */
 void cubiverse::World::createMesh(int x, int z){
-	if(hasChunk(x,z) && getChunk(x,z)->mesh->existdata() && getChunk(x,z)->mesh_water->existdata()) {
+	if(hasChunk(x,z) && getChunk(x,z)->mesh->existdata() && getChunk(x,z)->water->waterMesh->existdata()) {
 		getChunk(x,z)->mesh->createMesh();
-		getChunk(x,z)->mesh_water->createMesh();
+		getChunk(x,z)->water->waterMesh->createMesh();
 	}
 }
 
@@ -376,7 +375,7 @@ void cubiverse::World::updateMesh(int p_x, int p_z){
 	if(hasChunk(p_x,p_z)) {
 		mutexRefreshVisible.lock();
 		getChunk(p_x,p_z)->mesh->updateMesh();
-		getChunk(p_x,p_z)->mesh_water->updateMesh();
+		getChunk(p_x,p_z)->water->waterMesh->updateMesh();
 		mutexRefreshVisible.unlock();
 	}
 }
@@ -387,15 +386,15 @@ void cubiverse::World::updateMesh(int p_x, int p_z){
 void cubiverse::World::renderChunk(int p_x, int p_z) {
 	if(hasChunk(p_x, p_z)) {
 		glBlendFunc(GL_SRC_COLOR,  GL_ONE_MINUS_SRC_ALPHA);
+		//glBlendFunc(GL_SRC_COLOR, GL_DST_COLOR);
 		getChunk(p_x, p_z)->mesh->render();
 	}
 }
 //TODO: Auf Texturen umstellen, immoment werden einfach die Farben kombiniert	
 void cubiverse::World::renderChunkWater(int p_x, int p_z) {
 	if(hasChunk(p_x, p_z)) {
-		glBlendFunc(GL_SRC_COLOR, GL_DST_COLOR);
-		getChunk(p_x, p_z)->mesh_water->render();
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
+		getChunk(p_x, p_z)->water->RenderTextures();
+		getChunk(p_x, p_z)->water->RenderWater();
 	}
 }
 

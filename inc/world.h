@@ -9,7 +9,9 @@
 #include "worldGenerator.h"
 #include "byteorder.h"
 #include "voxelart_engine/mesh.h"
+#include "voxelart_engine/water.h"
 #include "cube.h"
+
 
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
@@ -39,7 +41,7 @@ namespace cubiverse {
 		int m_blockLightning[16*128*16];
 		Cube::pointer_t m_cubes[16*128*16];
 		vaEngine::Mesh* mesh;
-		vaEngine::Mesh* mesh_water;
+		vaEngine::Water* water;
 
 		uint8_t getBlockType(int x, int y, int z) {  return m_blockType[BLOCK_INDEX(x,y,z)]; }
 		void setBlockType(int x, int y, int z, uint8_t blockType) { m_blockType[BLOCK_INDEX(x,y,z)] = blockType;}
@@ -51,7 +53,7 @@ namespace cubiverse {
 
 		World_Chunk() { 
 			mesh = new vaEngine::Mesh();
-			mesh_water = new vaEngine::Mesh();	
+			water = new vaEngine::Water(16, 50, "");
 		}					
 	};
 

@@ -16,6 +16,7 @@
 #include "texture.h"
 #include "font.h"
 #include "sprite.h"
+#include "water.h"
 
 /**
  * Hauptklasse der Bsb Engine.

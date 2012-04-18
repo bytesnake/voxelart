@@ -1,5 +1,6 @@
 #include "../inc/VoxelEditor.h"
 #include "../inc/color.h"
+#include <iostream>
 #include <math.h>
 
 //void cubiverse::VoxelEditor::VoxelEditor() {
