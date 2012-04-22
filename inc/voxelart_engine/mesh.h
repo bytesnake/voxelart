@@ -30,8 +30,11 @@ namespace vaEngine {
 		vector<Vertex> vertices;
 		vector<GLuint> indices;
 		bool isRender, existData;
+		GLuint multiTex;
+
 	    public:
 		Mesh();
+		Mesh(GLuint num);
 	    	Vector* position;
 	    	virtual void render();
 	    	void createMesh();

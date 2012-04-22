@@ -2,7 +2,6 @@
 #define GAME_H
 
 #include "voxelart_engine/game.h"
-#include "PlayerBody.h"
 #include "world.h"
 #include "GUI.h"
 #include "VoxelEditor.h"

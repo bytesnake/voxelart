@@ -1,12 +1,13 @@
 #ifndef VOXELART_MESH_H
 #define VOXELART_MESH_H
 
-#include "texture.h"
-#include "vector.h"
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
+
+#include "texture.h"
+#include "vector.h"
 
 using namespace std;
 using namespace vaEngine;
@@ -29,8 +30,11 @@ namespace vaEngine {
 		vector<Vertex> vertices;
 		vector<GLuint> indices;
 		bool isRender, existData;
+		GLuint multiTex;
+
 	    public:
 		Mesh();
+		Mesh(int num);
 	    	Vector* position;
 	    	virtual void render();
 	    	void createMesh();

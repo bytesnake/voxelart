@@ -30,13 +30,6 @@ bool k_left;
 bool k_right;
 bool k_up;
 bool k_down;
- 
-GLfloat light_position[] = { 0.35, 0.5f, 0.15, 0.0 };
-GLfloat light_position2[] = { -0.35, -0.5f, -0.15, 0.0 };
-GLfloat light_ambient  [] = {0.1, 0.1, 0.1, 1.0};
-GLfloat light_diffuse [] = {0.2, 0.2, 0.2, 1.0};
-GLfloat light_ambient2  [] = {0.0, 0.0, 0.0, 1.0};
-GLfloat light_diffuse2 [] = {-0.2, -0.2, -0.2, 1};
 	
 //Alte Koordinaten, um zu überprüfen ob sich die Kamera bewegt hat
 int oldPlayerX, oldPlayerZ;
@@ -47,7 +40,6 @@ int main(int arg_c,char** arg_v){
 	game->setSize(800,600);// Fenstergröße Setzen
 	game->start(arg_c,arg_v);// das Spiel starten :)
 
-
 	return 0;
 }
 
@@ -55,39 +47,31 @@ int main(int arg_c,char** arg_v){
 //Fenster, Welt, Kamera und Licht inialisieren
 void cubiverse::Game::init(){
 	//Title setzten und Cursor verstecken
-	setTitle("Cubiverse");
-	//hideCursor();
+	setTitle("VoxelArt");
 
-	//Neue (test) world generieren
+	//GUI erzeugen
 	GUI = boost::make_shared<cubiverse::GUI>(width, height);
 
 	// First Person Kamera initialisieren
 	myCamera=new vaEngine::FPCamera(0,-100,0);
 
-	//Position des einen Lichts, das wir haben
-	GLfloat light_position[] = { 0.35, 0.5f, 0.15, 0.0 };
-	GLfloat light_position2[] = { -0.35, -0.5f, -0.15, 0.0 };
-	//jetzt nutzen wir Licht und Gegenlich
-	GLfloat light_ambient  [] = {0.1, 0.1, 0.1, 1.0};
-	GLfloat light_diffuse [] = {0.2, 0.2, 0.2, 1.0};
-	GLfloat light_ambient2  [] = {0.0, 0.0, 0.0, 1.0};
-	GLfloat light_diffuse2 [] = {-0.1, -0.1, -0.1, 1.0};
-	// Licht aufsetzen und anschalten TODO in Lichtklasse auslagern
-	glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
-	glLightfv(GL_LIGHT1, GL_AMBIENT,  light_ambient2);
-	glLightfv(GL_LIGHT1, GL_DIFFUSE,  light_diffuse2);
-	glEnable(GL_LIGHTING);
-	glEnable(GL_LIGHT0);
-	glEnable(GL_LIGHT1);
+	//Globales Licht setzten
+	glActivateLight(0);
+	glSetLightPosition(0, 0.35, 0.5f, 0.15);
+	glSetLightAmbient(0, 0.1, 0.1, 0.1, 1.0);
+	glSetLightDiffuse(0, 0.2, 0.2, 0.2, 1.0);
+	glUpdateLight(0);
+
+	glActivateLight(1);
+	glSetLightPosition(1, -0.35, -0.5f, -0.15);
+	glSetLightAmbient(1, 0.0, 0.0, 0.0, 1.0);
+	glSetLightDiffuse(1, -0.1, -0.1, -0.1, 1.0);
+	glUpdateLight(1);	
 
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         glEnableClientState(GL_COLOR_ARRAY);
         glEnableClientState(GL_NORMAL_ARRAY);
         glEnableClientState(GL_VERTEX_ARRAY);
-	
-	glEnable (GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
 
 	voxelEditor = boost::make_shared<cubiverse::VoxelEditor>(); 
 
@@ -163,12 +147,11 @@ void cubiverse::Game::update(float p_seconds)
 void cubiverse::Game::render()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); //Der Bildschirm wird geleert TODO in Bsb_Game auslagern?
-	glLoadIdentity(); //Alle Verschiebungen, Rotationen usw. werden zurückgesetzt.
-	myCamera->lookThrough(); //Wir schauen durch die Kamera
-	glEnable(GL_LIGHTING); //Licht an	
-	glLightfv(GL_LIGHT0, GL_POSITION, light_position); //Lichtposition wird gesetzt TODO in Lichtklasse auslagern
-	glLightfv(GL_LIGHT1, GL_POSITION, light_position2); //Lichtposition wird gesetzt TODO in Lichtklasse auslagern
 	glClearColor(0.0,0.0,0.0,0.0);
+	glLoadIdentity(); //Alle Verschiebungen, Rotationen usw. werden zurückgesetzt.
+
+	myCamera->lookThrough(); //Wir schauen durch die Kamera
+	glUpdateLights(); //Licht updaten
 	glDisable(GL_TEXTURE_2D);
 	
 	int playerX = ((int)myCamera->position.x-(int)myCamera->position.x%16);
@@ -177,13 +160,6 @@ void cubiverse::Game::render()
 	if(GUI->getMenu() == "Singleplayer" || GUI->getMenu() == "Multiplayer") {
 		if(testWorldInit) test_world->renderWaterTextures(playerX, playerZ);
 	}
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); 
-	glLoadIdentity();
-	myCamera->lookThrough(); 
-	glClearColor(0.0,0.0,0.0,0.0);
-	backToFrustum();
-	glDisable(GL_TEXTURE_2D);
 
 	//Falls sich die Position des Spieler um 16 in X/Z geändert hat
 	if(playerX != oldPlayerX || playerZ != oldPlayerZ) {
